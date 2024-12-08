@@ -1,5 +1,9 @@
 import { ExpenseCategory } from "./budgetManager";
 import { BudgetFacade } from "./facade";
+import {
+  AveragePredictionStrategy,
+  LastMonthPredictionStrategy,
+} from "./predictionStrategies";
 
 import { CategoryReportStrategy, DateReportStrategy } from "./reportStrategies";
 
@@ -20,6 +24,8 @@ exportButton?.addEventListener("click", exportData);
 const budgetFacade = new BudgetFacade();
 const categoryReport = new CategoryReportStrategy();
 const monthlyReport = new DateReportStrategy();
+const averagePredictionStrategy = new AveragePredictionStrategy();
+const lastMonthPredictionStrategy = new LastMonthPredictionStrategy();
 
 // Add Income
 function addIncome() {
@@ -29,7 +35,7 @@ function addIncome() {
   const amount = parseFloat(amountEl.value);
   const date = new Date(dateEl.value);
 
-  if (!amount || amount <= 0 || !date) {
+  if (!amount || amount <= 0 || !date || isNaN(date.getTime())) {
     alert("Must provide a valid amount or date");
     return;
   }
@@ -38,6 +44,7 @@ function addIncome() {
   alert("Added Income");
   amountEl.value = "";
   dateEl.value = "";
+  onStateChange();
 }
 
 // Add Expense
@@ -53,7 +60,7 @@ function addExpense() {
   ) as HTMLInputElement;
   const category = categoryEl.value;
 
-  if (!amount || amount <= 0 || !date || !category) {
+  if (!amount || amount <= 0 || !date || isNaN(date.getTime()) || !category) {
     alert("Must provide a valid amount or date or category");
     return;
   }
@@ -61,6 +68,7 @@ function addExpense() {
   amountEl.value = "";
   dateEl.value = "";
   categoryEl.value = "";
+  onStateChange();
 }
 
 // Set Monthly Limit
@@ -69,12 +77,13 @@ function setMonthlyLimit() {
   const limit = parseFloat(limitEl.value);
 
   if (!limit || limit <= 0) {
-    alert("Must provide a valid ");
+    alert("Must provide a valid limit.");
     return;
   }
   budgetFacade.setMonthlyLimit(limit);
   alert(`Monthly limit set to: ${limit}`);
   limitEl.value = "";
+  onStateChange();
 }
 
 // Generate Report
@@ -86,6 +95,14 @@ function generateReport() {
 
   const reportType = (document.getElementById("reportType") as HTMLInputElement)
     .value;
+
+  if (
+    (startDate && isNaN(startDate.getTime())) ||
+    (endDate && isNaN(endDate.getTime()))
+  ) {
+    alert("Enter a valid date");
+    return;
+  }
 
   if (reportType === "category") {
     budgetFacade.setReportStrategy(categoryReport);
@@ -104,6 +121,16 @@ function generateReport() {
 
 // Predict Expenses
 function predictExpenses() {
+  const predictStrategy = (
+    document.getElementById("predictStrategy") as HTMLInputElement
+  ).value;
+
+  if (predictStrategy === "average") {
+    budgetFacade.setPredictionStrategy(averagePredictionStrategy);
+  } else if (predictStrategy === "lastMonth") {
+    budgetFacade.setPredictionStrategy(lastMonthPredictionStrategy);
+  }
+
   const prediction = budgetFacade.predictExpenses();
   document.getElementById(
     "predictionOutput"
@@ -117,3 +144,55 @@ function exportData() {
   const exportedData = budgetFacade.exportData(exportType);
   document.getElementById("exportOutput")!.innerText = exportedData;
 }
+
+function updateMonthlySummary() {
+  const monthlyLimitEl = document.getElementById("monthlyLimitData")!;
+  const totalIncomeEl = document.getElementById("totalIncomeData")!;
+  const totalExpensesEl = document.getElementById("totalExpensesData")!;
+
+  const { monthlyLimit, totalIncome, totalExpenses } = budgetFacade.getBudget();
+
+  monthlyLimitEl.innerText = monthlyLimit.toFixed(2);
+  totalIncomeEl.innerText = totalIncome.toFixed(2);
+  totalExpensesEl.innerText = totalExpenses.toFixed(2);
+}
+
+function renderIncomesAndExpenses() {
+  const incomeList = document.getElementById("incomeList")!;
+  const expenseList = document.getElementById("expenseList")!;
+
+  // Clear the current lists
+  incomeList.innerHTML = "";
+  expenseList.innerHTML = "";
+
+  // Render incomes
+  const incomes = budgetFacade.getIncomes();
+  incomes.forEach((income) => {
+    const li = document.createElement("li");
+    li.textContent = `Amount: ${
+      income.amount
+    }, Date: ${income.date.toLocaleDateString()}`;
+    incomeList.appendChild(li);
+  });
+
+  // Render expenses
+  const expenses = budgetFacade.getExpenses();
+  expenses.forEach((expense) => {
+    const li = document.createElement("li");
+    li.textContent = `Amount: ${
+      expense.amount
+    }, Date: ${expense.date.toLocaleDateString()}, Category: ${
+      expense.category
+    }`;
+    expenseList.appendChild(li);
+  });
+}
+
+function onStateChange() {
+  updateMonthlySummary();
+  renderIncomesAndExpenses();
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  onStateChange();
+});

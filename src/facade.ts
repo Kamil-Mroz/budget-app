@@ -21,6 +21,21 @@ export class BudgetFacade {
     this.budgetManager.addExpense(amount, date, category);
   }
 
+  getBudget() {
+    const monthlyLimit = this.budgetManager.getMonthlyLimit();
+    const totalIncome = this.budgetManager.getTotalIncomeThisMonth();
+    const totalExpenses = this.budgetManager.getTotalExpensesThisMonth();
+    return { monthlyLimit, totalIncome, totalExpenses };
+  }
+
+  getIncomes() {
+    return this.budgetManager.getIncomes();
+  }
+
+  getExpenses() {
+    return this.budgetManager.getExpenses();
+  }
+
   setReportStrategy(strategy: ReportStrategy): void {
     this.reportStrategy = strategy;
   }

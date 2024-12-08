@@ -17,7 +17,18 @@ export class BudgetManager {
   }[] = [];
   private monthlyLimit: number = 0;
 
-  private constructor() {}
+  private constructor() {
+    this.loadFromStorage();
+  }
+
+  private saveToStorage(): void {
+    const data = {
+      incomes: this.incomes,
+      expenses: this.expenses,
+      monthlyLimit: this.monthlyLimit,
+    };
+    localStorage.setItem("budgetData", JSON.stringify(data));
+  }
 
   public static getInstance(): BudgetManager {
     if (!BudgetManager.instance) {
@@ -28,10 +39,12 @@ export class BudgetManager {
 
   addIncome(amount: number, date: Date): void {
     this.incomes.push({ amount, date });
+    this.saveToStorage();
   }
 
   addExpense(amount: number, date: Date, category: ExpenseCategory): void {
     this.expenses.push({ amount, date, category });
+    this.saveToStorage();
   }
 
   getIncomes(): { amount: number; date: Date }[] {
@@ -44,6 +57,24 @@ export class BudgetManager {
 
   setMonthlyLimit(limit: number): void {
     this.monthlyLimit = limit;
+    this.saveToStorage();
+  }
+
+  private loadFromStorage(): void {
+    const data = localStorage.getItem("budgetData");
+    if (data) {
+      const parsedData = JSON.parse(data);
+      this.incomes = parsedData.incomes.map((income: any) => ({
+        amount: parseFloat(income.amount),
+        date: new Date(income.date),
+      }));
+      this.expenses = parsedData.expenses.map((expense: any) => ({
+        ...expense,
+        amount: parseFloat(expense.amount),
+        date: new Date(expense.date),
+      }));
+      this.monthlyLimit = parseFloat(parsedData.monthlyLimit) || 0;
+    }
   }
 
   getMonthlyLimit(): number {
@@ -61,5 +92,17 @@ export class BudgetManager {
           expense.date.getMonth() === currentMonth
       )
       .reduce((total, expense) => total + expense.amount, 0);
+  }
+  getTotalIncomeThisMonth(): number {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+
+    return this.incomes
+      .filter(
+        (income) =>
+          income.date.getFullYear() === currentYear &&
+          income.date.getMonth() === currentMonth
+      )
+      .reduce((total, income) => total + income.amount, 0);
   }
 }

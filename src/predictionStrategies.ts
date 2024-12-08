@@ -1,7 +1,6 @@
 import { ExpenseCategory } from "./budgetManager";
 import { groupByMonth } from "./utils";
 
-
 export interface PredictionStrategy {
   predict(
     expenses: { amount: number; date: Date; category: ExpenseCategory }[]
@@ -43,6 +42,6 @@ export class LastMonthPredictionStrategy implements PredictionStrategy {
 
     const lastMonth = sortedMonths.length - 1;
 
-    return monthlyTotals[lastMonth];
+    return monthlyTotals[lastMonth] ?? 0;
   }
 }

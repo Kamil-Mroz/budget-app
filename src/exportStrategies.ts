@@ -16,6 +16,7 @@ export class JSONExporter implements Exporter {
     return JSON.stringify(data, null, 2);
   }
 }
+
 export class XMLExporter implements Exporter {
   exportData(data: any): string {
     const rows = data
@@ -23,10 +24,10 @@ export class XMLExporter implements Exporter {
         (row: any) =>
           `<row>${Object.entries(row)
             .map(([key, value]) => `<${key}>${value}</${key}>`)
-            .join("")}</row>`
+            .join("")}</row>\n`
       )
       .join("");
-    return `<data>${rows}</data>`;
+    return `<data>\n${rows}</data>`;
   }
 }
 // FACTORY

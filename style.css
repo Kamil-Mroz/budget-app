@@ -1,0 +1,31 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  max-height: 100vh;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.col {
+  display: grid;
+  grid-template-rows: 300px 300px;
+}
+
+.col > div {
+  max-height: 100%;
+  overflow-y: scroll;
+  height: 100%;
+}
+
+.col > div > h2 {
+  position: sticky;
+  background-color: white;
+  margin: 0;
+  padding: 0.5rem;
+  top: 0;
+}
