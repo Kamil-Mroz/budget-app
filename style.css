@@ -6,6 +6,10 @@ body {
   max-height: 100vh;
 }
 
+h1 {
+  margin: 0;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
