@@ -3,33 +3,125 @@
 }
 
 body {
-  max-height: 100vh;
+  font-family: sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
 }
 
 h1 {
-  margin: 0;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
 }
 
-.col {
+#col {
   display: grid;
-  grid-template-rows: 300px 300px;
+  grid-template-rows: 375px 375px;
+  gap: 20px;
 }
 
-.col > div {
+#col > div {
   max-height: 100%;
   overflow-y: scroll;
   height: 100%;
+  background-color: white;
 }
 
-.col > div > h2 {
+#col > div > h2 {
   position: sticky;
   background-color: white;
   margin: 0;
   padding: 0.5rem;
   top: 0;
+}
+
+input,
+select,
+button {
+  width: 30%;
+  padding: 10px;
+  margin: 5px 0 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: block;
+}
+
+li > button {
+  display: inline-block;
+  background-color: #af504c;
+  width: max-content;
+  padding: 0.5rem 1rem;
+}
+
+li > button:active {
+  background-color: #af504c;
+}
+li > button:hover {
+  background-color: #a04549;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  background-color: #388e3c;
+}
+
+#monthlySummary {
+  margin-bottom: 20px;
+}
+
+#monthlySummary p {
+  margin: 10px 0;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+li {
+  margin: 5px 0;
+  padding: 4px 8px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+li:nth-child(even) {
+  background-color: #f1f1f1;
+}
+
+#reportOutput,
+#predictionOutput,
+#exportOutput {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e3e3e3;
+  border-radius: 5px;
 }

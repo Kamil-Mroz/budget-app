@@ -1,10 +1,9 @@
-import { ExpenseCategory } from "./budgetManager";
-import { groupByMonth, objectToString } from "./utils";
+import { formatReport, groupByMonth } from "./utils";
 
 export interface ReportStrategy {
   generateReport(
     incomes: { amount: number; date: Date }[],
-    expenses: { amount: number; date: Date; category: ExpenseCategory }[],
+    expenses: { amount: number; date: Date; category: string }[],
     startDate?: Date,
     endDate?: Date
   ): string;
@@ -13,7 +12,7 @@ export interface ReportStrategy {
 export class CategoryReportStrategy implements ReportStrategy {
   generateReport(
     incomes: { amount: number; date: Date }[],
-    expenses: { amount: number; date: Date; category: ExpenseCategory }[],
+    expenses: { amount: number; date: Date; category: string }[],
     startDate?: Date,
     endDate?: Date
   ): string {
@@ -26,16 +25,16 @@ export class CategoryReportStrategy implements ReportStrategy {
     const categories = filteredExpenses.reduce((summary, exp) => {
       summary[exp.category] = (summary[exp.category] || 0) + exp.amount;
       return summary;
-    }, {} as Record<ExpenseCategory, number>);
+    }, {} as Record<string, number>);
 
-    const categorySummary = objectToString(categories);
+    const categorySummary = formatReport(categories);
 
     const filteredIncome = incomes.filter(
       (income) =>
         (!startDate || income.date >= startDate) &&
         (!endDate || income.date <= endDate)
     );
-    const incomeSummary = objectToString(groupByMonth(filteredIncome));
+    const incomeSummary = formatReport(groupByMonth(filteredIncome));
 
     return `Income Report:\n${incomeSummary} \nCategory Report: \n${categorySummary}`;
   }
@@ -44,7 +43,7 @@ export class CategoryReportStrategy implements ReportStrategy {
 export class DateReportStrategy implements ReportStrategy {
   generateReport(
     incomes: { amount: number; date: Date }[],
-    expenses: { amount: number; date: Date; category: ExpenseCategory }[],
+    expenses: { amount: number; date: Date; category: string }[],
     startDate?: Date,
     endDate?: Date
   ): string {
@@ -54,7 +53,7 @@ export class DateReportStrategy implements ReportStrategy {
         (!endDate || exp.date <= endDate)
     );
 
-    const summary = objectToString(groupByMonth(filteredExpenses));
+    const summary = formatReport(groupByMonth(filteredExpenses));
 
     const filteredIncome = incomes.filter(
       (income) =>
@@ -62,7 +61,7 @@ export class DateReportStrategy implements ReportStrategy {
         (!endDate || income.date <= endDate)
     );
 
-    const incomeSummary = objectToString(groupByMonth(filteredIncome));
+    const incomeSummary = formatReport(groupByMonth(filteredIncome));
 
     return `Income Report:\n${incomeSummary}\n Date Report:\n${summary}`;
   }
