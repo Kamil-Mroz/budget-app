@@ -10,7 +10,7 @@ export class BudgetView {
   private reportOutput = document.getElementById("reportOutput")!;
   private predictionOutput = document.getElementById("predictionOutput")!;
   private exportOutput = document.getElementById("exportOutput")!;
-
+  private errorMessage = document.getElementById("errorMessage")!;
   updateMonthlySummary(
     monthlyLimit: number,
     totalIncome: number,
@@ -19,6 +19,8 @@ export class BudgetView {
     this.monthlyLimitData.innerText = formatCurrency(monthlyLimit);
     this.totalIncomeData.innerText = formatCurrency(totalIncome);
     this.totalExpensesData.innerText = formatCurrency(totalExpenses);
+    this.errorMessage.innerHTML =
+      monthlyLimit < totalExpenses ? "You are over the monthly limit" : "";
   }
 
   renderIncomes(incomes: IncomeType[]): void {
